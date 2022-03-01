@@ -5,14 +5,14 @@ SECRETGEN_RELEASE="secretgen-controller-release/release.yml"
 # extracts and installs the necessary plugins for tap
 install_tanzu_cli() {
   mkdir /tmp/tanzu
-  tar -zxvf $TANZU_CLI_TARBALL -C /tmp/tanzu
+  tar -zxvf $TANZU_CLI_TARBALL -C /tmp/tanzu > /dev/null
 
-  pushd /tmp/tanzu
+  pushd /tmp/tanzu > /dev/null
     install cli/core/*/tanzu-core-linux_amd64 /usr/local/bin/tanzu
     tanzu config set features.global.context-aware-cli-for-plugins false
-    tanzu plugin install --local cli secret
-    tanzu plugin install --local cli package
-  popd
+    tanzu plugin install --local cli secret > /dev/null
+    tanzu plugin install --local cli package > /dev/null
+  popd > /dev/null
 }
 
 # install kapp controller and secretgen controller, the prereqs for any tap
@@ -27,8 +27,8 @@ install_prereqs() {
   fi
 
   echo "Installing prereqs"
-  kapp deploy -a kapp-controller -f $KAPP_RELEASE -y
-  kapp deploy -a secretgen-controller -f $SECRETGEN_RELEASE -y
+  kapp deploy -a kapp-controller -f $KAPP_RELEASE -y > /dev/null
+  kapp deploy -a secretgen-controller -f $SECRETGEN_RELEASE -y > /dev/null
 
   install_tanzu_cli
   _tanzu secret registry add tap-registry --username "$user" --password "$pass" --server dev.registry.tanzu.vmware.com --export-to-all-namespaces --yes
@@ -41,7 +41,7 @@ install_package() {
   local package_name=$2
   local version=$3
 
-  kubectl apply -f "tap-packages/packages/$package/metadata.yaml" -f "tap-packages/packages/$package/$version/package.yaml"
+  kubectl apply -f "tce-packages/packages/$package/metadata.yaml" -f "tce-packages/packages/$package/$version/package.yaml"
   _tanzu package install "$package" --package-name "$package_name" --version $version
 }
 

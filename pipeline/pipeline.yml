@@ -55,79 +55,26 @@ resources:
     username: ((fluxcd.gitlab.username))
     password: ((fluxcd.gitlab.password))
 
-- name: fluxcd-packages
-  type: git
-  source:
-    uri: https://github.com/fluxcd/source-controller.git
-    username: ((fluxcd.github.username))
-    password: ((fluxcd.github.password))
-
-- name: tce-package
+- name: tce-packages
   type: git
   source:
     uri: https://github.com/vmware-tanzu/package-for-source-controller.git
-    username: ((fluxcd.gitlab.username))
-    token: ((fluxcd.github.token))
+    brach: main
+    username: ((fluxcd.github.username))
+    password: ((fluxcd.github.token))
 
 - name: tce-packages-push
   type: git
   source:
     uri: https://github.com/vmware-tanzu/package-for-source-controller.git
-    username: ((fluxcd.gitlab.username))
-    token: ((fluxcd.github.token))
-
-- name: flux-source-controller-registry
-  type: registry-image
-  icon: docker
-  source:
-    repository: ((fluxcd.registry.hostname))/fluxcd-source-controller/fluxcd-source-controller-image
-    username: ((fluxcd.registry.user))
-    password: ((fluxcd.registry.token))
-
-
-- name: flux-golang-with-libgit2-registry
-  type: registry-image
-  icon: docker
-  source:
-    repository: ((fluxcd.registry.hostname))/fluxcd-source-controller/fluxcd-go-with-libgit-image
-    username: ((fluxcd.registry.user))
-    password: ((fluxcd.registry.token))
-
-- name: ci
-  type: git
-  source:
-    uri: https://gitlab.eng.vmware.com/app-ops-cicd-integrations/oss-projects.git
-    username: ((fluxcd.gitlab.username))
-    password: ((fluxcd.gitlab.password))
-    paths:
-      - fluxcd
-
-- name: grype-release
-  type: github-release
-  source:
-    owner: anchore
-    repository: grype
-    access_token: ((fluxcd.github.token))
+    username: ((fluxcd.github.username))
+    password: ((fluxcd.github.token))
 
 - name: yq-release
   type: github-release
   source:
     owner: mikefarah
     repository: yq
-    access_token: ((fluxcd.github.token))
-
-- name: imgpkg-release
-  type: github-release
-  source:
-    owner: vmware-tanzu
-    repository: carvel-imgpkg
-    access_token: ((fluxcd.github.token))
-
-- name: crane-release
-  type: github-release
-  source:
-    owner: google
-    repository: go-containerregistry
     access_token: ((fluxcd.github.token))
 
 - name: kind-on-c
@@ -283,7 +230,7 @@ jobs:
             - default-config.yml
             EOL
 
-            # Add fluxcd-prefix on RBAC to avoid conflicts with our custom source-controller
+            # Add fluxcd prefix on RBAC to avoid conflicts with our custom source-controller
             cat >> flux-source-controller/config/rbac/kustomization.yaml <<EOL
             namePrefix: fluxcd-source-
             EOL
@@ -318,10 +265,6 @@ jobs:
             set -ex
 
             export PATH="$PATH:$(pwd)/tools"
-
-            apt-get update
-
-            apt-get -y install wget libdigest-sha-perl
 
             # Avoid using docker login
             ko login -u "$REGISTRY_USERNAME" -p "$REGISTRY_PASSWORD" "$REGISTRY_HOSTNAME"
@@ -419,11 +362,11 @@ jobs:
 
             cd tce-packages
             # generate package.yaml
-            mkdir -p packages/fluxcd-source-controller/$version
-            ytt -v version=$version -v bundle=$bundle -v timestamp=$timestamp -f ../template.yaml > packages/fluxcd-source-controller/$version/package.yaml
+            mkdir -p packages/$version
+            ytt -v version=$version -v bundle=$bundle -v timestamp=$timestamp -f ../template.yaml > packages/$version/package.yaml
 
             # update tap-pkg to latest version
-            sed -i "s;constraints: .*;constraints: $version;g" tap-pkg/config/fluxcd-source-controller.yaml
+            # sed -i "s;constraints: .*;constraints: $version;g" tce-pkg/config/fluxcd-source-controller.yaml
 
             git config --global user.email "ci@localhost"
             git config --global user.name "CI Bot"
@@ -431,29 +374,6 @@ jobs:
             git add -A
             git commit -m "bump package for fluxcd-source-controller $version"
 
-  - task: verify-yaml
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: {repository: harbor-repo.vmware.com/tac-photon/golang, tag: 1.16}
-      params:
-        TAG_VERSION: ((.:tag_version))
-      inputs:
-        - name: tap-packages
-      run:
-        path: /bin/bash
-        args:
-          - -c
-          - |
-            set -ex
-
-            version="$(echo $TAG_VERSION | tr -d v)"
-
-            cd tce-packages
-
-            go run scripts/metadata.go packages/fluxcd-source-controller/metadata.yaml
-            go run scripts/package.go packages/fluxcd-source-controller/$version/package.yaml
 
   - put: tce-packages-push
     params:
@@ -464,11 +384,9 @@ jobs:
 - name: test
   plan:
   - in_parallel:
-    - get: ci
     - get: flux-source-controller
     - get: ko-mirror
-    - get: tap-packages
-      resource: tap-packages-push
+    - get: tce-packages
     - get: kind-on-c
     - get: kind-release
       params: { globs: [kind-linux-amd64] }
@@ -493,60 +411,48 @@ jobs:
         source: {repository: harbor-repo.vmware.com/dockerhub-proxy-cache/library/ubuntu}
       inputs:
         - name: secretgen-controller-release
+        - name: tce-packages
         - name: kapp-controller-release
         - name: tanzu-framework-release
         - name: flux-source-controller
-        - name: tap-packages
-        - name: ci
         - name: kapp-release
         - name: yq-release
       outputs: [{name: inputs}]
       run:
-        path: ci/fluxcd-source-controller/tasks/scripts/aggregate-inputs.sh
-
-  - task: test-yaml
-    file: ci/tasks/validate-yaml.yml
-    params:
-      PACKAGE_NAME: fluxcd-source-controller
-      PACKAGE_VERS: ((.:tag_version))
+        path: tce-packages/pipeline/tasks/scripts/aggregate-inputs.sh
 
   - task: test-installation
     privileged: true
     file: kind-on-c/kind.yaml
     params:
-      KIND_PRE_START: inputs/ci/hack/configure-kind.sh
+      KIND_PRE_START: inputs/tce-packages/hack/configure-kind.sh
       KIND_TESTS: |
         set -e
 
         cd inputs
-        source ci/hack/_helpers.sh
+        source tce-packages/hack/_helpers.sh
 
-        install_prereqs '((fluxcd.registry.user))' '((fluxcd.registry.token))'
+        install_prereqs '((fluxcd.tap_registry.user))' '((fluxcd.tap_registry.token))'
 
         new_version="$(version_from_semver ((.:tag_version)))"
-        old_version="$(version_from_tap fluxcd-source-controller.yaml)"
 
         echo "Testing Install"
-        install_package "fluxcd-source-controller" "fluxcd.source.controller.tanzu.vmware.com" $new_version
+        install_package "fluxcd-source-controller" "fluxcd.source.controller.community.tanzu.vmware.com" $new_version
 
         echo "Testing Uninstall"
         delete_package "fluxcd-source-controller"
-
-        echo "Testing Upgrade"
-        install_package "fluxcd-source-controller" "fluxcd.source.controller.tanzu.vmware.com" $old_version
-        upgrade_package "fluxcd-source-controller" "fluxcd.source.controller.tanzu.vmware.com" $new_version
 
   - task: test-smoke
     privileged: true
     file: kind-on-c/kind.yaml
     params:
-      KIND_PRE_START: inputs/ci/hack/configure-kind.sh
+      KIND_PRE_START: inputs/tce-packages/hack/configure-kind.sh
       KIND_TESTS: |
         set -e
 
         cd inputs
 
-        source ci/hack/_helpers.sh
+        source tce-packages/hack/_helpers.sh
 
         CREATE_CLUSTER="${CREATE_CLUSTER:-true}"
         KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-kind}"
@@ -554,6 +460,9 @@ jobs:
         BUILD_PLATFORM="${BUILD_PLATFORM:-linux/amd64}"
         MINIO_HELM_VER="${MINIO_HELM_VER:-v6.3.1}"
         MINIO_TAG="${MINIO_TAG:-RELEASE.2020-09-17T04-49-20Z}"
+
+        IMG=test/source-controller
+        TAG=latest
 
         MC_RELEASE=mc.RELEASE.2021-12-16T23-38-39Z
         MC_AMD64_SHA256=d14302bbdaa180a073c1627ff9fbf55243221e33d47e32df61a950f635810978
@@ -566,7 +475,7 @@ jobs:
         BUILD_DIR="${ROOT_DIR}/build"
 
         echo "Installing tanzu prerequisits"
-        install_prereqs '((fluxcd.registry.user))' '((fluxcd.registry.token))'
+        install_prereqs '((fluxcd.tap_registry.user))' '((fluxcd.tap_registry.token))'
 
         new_version="$(version_from_semver ((.:tag_version)))"
 
@@ -576,7 +485,7 @@ jobs:
         ./get_helm.sh
 
         echo "Installing fluxcd-source-controller newest version"
-        install_package "fluxcd-source-controller" "fluxcd.source.controller.tanzu.vmware.com" $new_version
+        install_package "fluxcd-source-controller" "fluxcd.source.controller.community.tanzu.vmware.com" $new_version
 
         function cleanup(){
             EXIT_CODE="$?"
@@ -611,7 +520,7 @@ jobs:
 
 
         echo "Run smoke tests"
-        kubectl -n flux-system apply -f "ci/fluxcd-source-controller/test-samples"
+        kubectl -n flux-system apply -f "flux-source-controller/config/samples"
         kubectl -n flux-system rollout status deploy/source-controller --timeout=1m
         kubectl -n flux-system wait gitrepository/gitrepository-sample --for=condition=ready --timeout=1m
         kubectl -n flux-system wait helmrepository/helmrepository-sample --for=condition=ready --timeout=1m
@@ -684,93 +593,3 @@ jobs:
         kubectl -n flux-system apply -f "flux-source-controller/config/testdata/git/large-repo.yaml"
         kubectl -n flux-system wait gitrepository/large-repo-go-git --for=condition=ready --timeout=2m15s
         kubectl -n flux-system wait gitrepository/large-repo-libgit2 --for=condition=ready --timeout=2m15s
-
-- name: scan
-  plan:
-  - in_parallel:
-    - get: ci
-    - get: tap-packages
-      resource: tap-packages-push
-      passed: [create-flux-imgpkg-bundle]
-      trigger: true
-    - get: libgit2
-      resource: flux-golang-with-libgit2
-    - get: repo
-      resource: flux-source-controller
-      passed: [create-flux-imgpkg-bundle]
-    - *yq-release
-    - *imgpkg-release
-    - *grype-release
-    - *crane-release
-  - load_var: tag_version
-    file: repo/.git/ref
-  - task: download-images
-    file: ci/tasks/download-images.yml
-    params:
-      HARBOR_USER: ((fluxcd.registry.user))
-      HARBOR_PASS: ((fluxcd.registry.token))
-      PACKAGE_NAME: fluxcd-source-controller
-      PACKAGE_VERS: ((.:tag_version))
-  - task: analyze-with-coverity
-    privileged: true
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: {repository: devtools-docker.artifactory.eng.vmware.com/vmware/runway/resourcetypes/coverity-resource, tag: 2.2.1}
-      inputs:
-        - name: repo
-        - name: libgit2
-      outputs: [{name: .cov}]
-      run:
-        path: /bin/bash
-        args:
-          - -c
-          - |
-            set -ex
-
-            apt-get update -y
-
-            apt-get install -y pkg-config libssl-dev
-
-            # set-up libgit2 library
-            pushd libgit2
-              pushd hack
-                make libgit2
-              popd
-            popd
-
-            cov-configure --comptype go --compiler /cov-analysis-linux64-2021.9.0/go/bin/go --config cov-config/coverity_config.xml
-
-            pushd repo
-              cov-build --dir ../.cov --config ../cov-config/coverity_config.xml /cov-analysis-linux64-2021.9.0/go/bin/go build -o . ./...
-            popd
-
-  - put: coverity       # Static Application Security Testing
-    inputs: [repo, .cov]
-    params:
-      steps:
-      - command: cov-manage-emit
-        args: --dir .cov reset-host-name
-      - command: cov-analyze
-        args: --dir .cov
-      - command: cov-commit-defects
-        args: --dir .cov
-  - in_parallel:
-    - task: grype       # Vulnerability Scanning
-      file: ci/tasks/grype-scan.yml
-    - put: osspi        # Software Composition Analysis
-      inputs: [combined]
-      params:
-        osspi-scan:
-          enable: true
-          scanning-cmd-params:
-            type: binary
-            local-file-url: combined/images.tar
-            force-scan: true
-            to-dashboard: true
-            osspi-url: https://osspi.eng.vmware.com/
-            osspi-apikey: ((fluxcd.osspi.apikey))
-            osspi-product: tap-commercial-ci-integrations
-            osspi-branch: fluxcd-source-controller
-            audit-tag: ((.:tag_version))
