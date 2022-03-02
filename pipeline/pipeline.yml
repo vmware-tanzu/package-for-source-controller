@@ -128,6 +128,7 @@ jobs:
 - name: create-flux-imgpkg-bundle
   plan:
   - get: flux-source-controller
+    trigger: true
   - get: ko-mirror
   - get: tce-packages
   - load_var: tag_version
@@ -387,6 +388,9 @@ jobs:
     - get: flux-source-controller
     - get: ko-mirror
     - get: tce-packages
+      resource: tce-packages-push
+      trigger: true
+      passed: [create-flux-imgpkg-bundle]
     - get: kind-on-c
     - get: kind-release
       params: { globs: [kind-linux-amd64] }
