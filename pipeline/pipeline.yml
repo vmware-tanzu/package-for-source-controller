@@ -243,9 +243,9 @@ jobs:
   - task: build-and-push-bundle
     privileged: true
     params:
-        REGISTRY_HOSTNAME: ((fluxcd.registry.hostname))
-        REGISTRY_USERNAME: ((fluxcd.registry.user))
-        REGISTRY_PASSWORD: ((fluxcd.registry.token))
+        REGISTRY_HOSTNAME: ((fluxcd.tce_registry.hostname))
+        REGISTRY_USERNAME: ((fluxcd.tce_registry.user))
+        REGISTRY_PASSWORD: ((fluxcd.tce_registry.password))
         TAG_VERSION: ((.:tag_version))
     config:
       platform: linux
@@ -275,7 +275,7 @@ jobs:
             mkdir crds/.imgpkg
 
             kbld -f crds/config/ --imgpkg-lock-output crds/.imgpkg/images.yml  > output/config.yml
-            imgpkg push --registry-username="$REGISTRY_USERNAME" --registry-password="$REGISTRY_PASSWORD" -b "$REGISTRY_HOSTNAME/eforondavmware/fluxcd-source-controller-bundle:$TAG_VERSION" -f crds/ --lock-output output/bundle.yml
+            imgpkg push --registry-username="$REGISTRY_USERNAME" --registry-password="$REGISTRY_PASSWORD" -b "$REGISTRY_HOSTNAME/tce/fluxcd-source-controller-bundle:$TAG_VERSION" -f crds/ --lock-output output/bundle.yml
 
   - task: create-branch
     config:
@@ -363,8 +363,8 @@ jobs:
 
             cd tce-packages
             # generate package.yaml
-            mkdir -p packages/$version
-            ytt -v version=$version -v bundle=$bundle -v timestamp=$timestamp -f ../template.yaml > packages/$version/package.yaml
+            mkdir -p packages/fluxcd-source-controller/$version
+            ytt -v version=$version -v bundle=$bundle -v timestamp=$timestamp -f ../template.yaml > packages/fluxcd-source-controller/$version/package.yaml
 
             # update tap-pkg to latest version
             # sed -i "s;constraints: .*;constraints: $version;g" tce-pkg/config/fluxcd-source-controller.yaml
