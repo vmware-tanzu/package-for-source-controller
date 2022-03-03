@@ -13,7 +13,7 @@ spec:
     spec:
       fetch:
       - imgpkgBundle:
-          image: index.docker.io/eforondavmware/fluxcd-source-controller-bundle@sha256:020f9efbc07d439bc9bc1857abdca053a9470eb98ba5d5af8de1fa43db141c93
+          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle@sha256:020f9efbc07d439bc9bc1857abdca053a9470eb98ba5d5af8de1fa43db141c93
       template:
       - ytt:
           inline:
