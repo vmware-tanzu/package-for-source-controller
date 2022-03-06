@@ -3,6 +3,8 @@
 
 set -e
 
+source tce-packages/hack/_helpers.sh
+
 LOAD_IMG_INTO_KIND="${LOAD_IMG_INTO_KIND:-true}"
 BUILD_PLATFORM="${BUILD_PLATFORM:-linux/amd64}"
 MINIO_HELM_VER="${MINIO_HELM_VER:-v6.3.1}"
@@ -14,10 +16,19 @@ MC_ARM64_SHA256=00791995bf8d102e3159e23b3af2f5e6f4c784fafd88c60161dcf3f0169aa217
 
 BUILD_DIR="./build"
 
+echo "Installing tanzu prerequisits"
+install_prereqs 'robot$runway' 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MzgzMDU5MTUsImlzcyI6ImhhcmJvci10b2tlbi1kZWZhdWx0SXNzdWVyIiwiaWQiOjE2MjEzNDMsInBpZCI6MjMwLCJhY2Nlc3MiOlt7IlJlc291cmNlIjoiL3Byb2plY3QvMjMwL3JlcG9zaXRvcnkiLCJBY3Rpb24iOiJwdXNoIiwiRWZmZWN0IjoiIn0seyJSZXNvdXJjZSI6Ii9wcm9qZWN0LzIzMC9oZWxtLWNoYXJ0IiwiQWN0aW9uIjoicmVhZCIsIkVmZmVjdCI6IiJ9LHsiUmVzb3VyY2UiOiIvcHJvamVjdC8yMzAvaGVsbS1jaGFydC12ZXJzaW9uIiwiQWN0aW9uIjoiY3JlYXRlIiwiRWZmZWN0IjoiIn1dfQ.a-2CU4d9rnCeygT-NGiApV8AEiFdYyM34nFcvJteqb8kLO-TT9I8Oc4kdeq5K-UWiIWOr-kWpr3Aa9VMPQ4Q4UedWXUKT6EMkq7iGrxcMDfQEsnsBrShwamGPvETKQFxmlO5WSzNUE6oBw6VNETjE2sb6qo7TB-ItxVGQtfFBulkBYD88INmMdMb4dG6yT3O8buXdKzuOyXeV0M846BsYJ9nuQ5Fv4TV2ADoFdhL0btVExefHNTnjzDPogWxogxQKnlf-o031mbB1ALmB3HJLD6Ys2fLBmF-Pi3oN8rQWctX8cH9NDeFBAl9VhXY4vxsJc2IwklJestaiIjKmhF3-BqZxjdI66K89Mz_w9A7niy6qLcg2m7rLNYzdb5pdJrD9dxxwEK6iMFtpowtH0AI-wW3cj4vZfQnaEVDK_7oaxXHtwU-Nd_pmMSSAYcU51B5ETMKLO6EgznBkRyi_eGPfnQAywjdIx4M5qCVTLWBkXin_fxZICSZ48mg8LMlfp_mevqzTaJ2lSaERl36Uc-x8H_Fydre2otw2C1eOTBmQ5j-5-TeUtIcjaa7HgK7nZLlCeYVlb2QZ0WX3k2fSODaF6lA2yvavekiHfkuKuZNQDmPSCMdW04NLb6AeBVjZehMVsPAZuTLTn_wMSIF4LntS9Ge0g7itW4qhPqLXV4aL7A'
+
+new_version="v0.21.2"
+
 echo "Installing helm"
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
+
+echo "Installing fluxcd-source-controller newest version"
+install_package "fluxcd-source-controller" "fluxcd.source.controller.community.tanzu.vmware.com" $new_version
+
 
 function cleanup(){
     EXIT_CODE="$?"
