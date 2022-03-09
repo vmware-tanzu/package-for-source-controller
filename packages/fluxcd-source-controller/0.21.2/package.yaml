@@ -1,9 +1,9 @@
 apiVersion: data.packaging.carvel.dev/v1alpha1
 kind: Package
 metadata:
-  name: fluxcd.source.controller.community.tanzu.vmware.com.0.21.2
+  name: fluxcd-source-controller.community.tanzu.vmware.com.0.21.2
 spec:
-  refName: fluxcd.source.controller.community.tanzu.vmware.com
+  refName: fluxcd-source-controller.community.tanzu.vmware.com
   version: 0.21.2
   releasedAt: "2022-02-07T11:14:08Z"
   valuesSchema:

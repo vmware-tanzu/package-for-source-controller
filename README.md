@@ -17,22 +17,22 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
 1. List version information for the package by running:
 
     ```shell
-    tanzu package available list fluxcd.source.controller.community.tanzu.vmware.com
+    tanzu package available list fluxcd-source-controller.community.tanzu.vmware.com
     ```
 
     For example:
 
     ```shell
-    $ tanzu package available list fluxcd.source.controller.community.tanzu.vmware.com
-        \ Retrieving package versions for fluxcd.source.controller.tanzu.vmware.com...
+    $ tanzu package available list fluxcd-source-controller.community.tanzu.vmware.com
+        \ Retrieving package versions for fluxcd-source-controller.tanzu.vmware.com...
           NAME                                                VERSION  RELEASED-AT
-          fluxcd.source.controller.community.tanzu.vmware.com  0.21.2   2021-10-27 19:00:00 -0500 -05
+          fluxcd-source-controller.community.tanzu.vmware.com  0.21.2   2021-10-27 19:00:00 -0500 -05
     ```
 
 2. Install the package by running:
 
     ```shell
-    tanzu package install fluxcd-source-controller -p fluxcd.source.controller.community.tanzu.vmware.com -v VERSION-NUMBER
+    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v VERSION-NUMBER
     ```
 
     Where:
@@ -42,9 +42,9 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     For example:
 
     ```shell
-    tanzu package install fluxcd-source-controller -p fluxcd.source.controller.community.tanzu.vmware.com -v 0.21.2
-    \ Installing package 'fluxcd.source.controller.community.tanzu.vmware.com'
-    | Getting package metadata for 'fluxcd.source.controller.community.tanzu.vmware.com'
+    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.21.2
+    \ Installing package 'fluxcd-source-controller.community.tanzu.vmware.com'
+    | Getting package metadata for 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Creating service account 'fluxcd-source-controller-default-sa'
     | Creating cluster admin role 'fluxcd-source-controller-default-cluster-role'
     | Creating cluster role binding 'fluxcd-source-controller-default-cluster-rolebinding'
@@ -67,7 +67,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     ```shell
     \ Retrieving installation details for fluxcd-source-controller...
     NAME:                    fluxcd-source-controller
-    PACKAGE-NAME:            fluxcd.source.controller.community.tanzu.vmware.com
+    PACKAGE-NAME:            fluxcd-source-controller.community.tanzu.vmware.com
     PACKAGE-VERSION:         0.21.2
     STATUS:                  Reconcile succeeded
     CONDITIONS:              [{ReconcileSucceeded True  }]
@@ -135,7 +135,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
 
     - Let's consume a `GitRepository` object,
 
-        - Create the following `gitrepository-sample.yaml` file:
+      - Create the following `gitrepository-sample.yaml` file:
 
           ```yaml
           apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -163,6 +163,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
           NAME                   URL                                       READY   STATUS                                                              AGE
           gitrepository-sample   https://github.com/stefanprodan/podinfo   True    Fetched revision: master/132f4e719209eb10b9485302f8593fc0e680f4fc   4s
           ```
+
     You can find more examples checking out the samples folder on [fluxcd/source-controller/samples](https://github.com/fluxcd/source-controller/tree/main/config/samples)
 
 ## Documentation
