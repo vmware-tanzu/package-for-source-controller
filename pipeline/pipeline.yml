@@ -210,7 +210,12 @@ jobs:
             cat > crds/config/values.yml <<EOL
             #@data/values
             ---
-            service_port: 80
+	    namespace: flux-system
+	    limits_cpu: 1000m
+            limits_memory: 1Gi
+	    service_port: 80
+	    no_proxy: ""
+	    https_proxy: ""            
             EOL
 
             # Adding kapp.yml to avoid Phanton diffs
@@ -312,8 +317,28 @@ jobs:
               version: #@ data.values.version
               releasedAt: #@ data.values.timestamp
               valuesSchema:
-                openAPIv3:
-                  properties: {}
+              openAPIv3:
+                properties:
+                  namespace:
+                    type: string
+                    description: Deployment and service namespace
+                    default: source-system
+                  limits_cpu:
+                    type: string
+                    description: Set cpu usuage limit
+                    default: 1000m
+                  limits_memory:
+                    type: string
+                    description: Set memory usuage limit
+                    default: 1Gi
+                  no_proxy:
+                    type: string
+                    description: Set domains for which no proxying should be performed
+                    default: ""
+                  https_proxy:
+                    type: string
+                    description: Set proxy connection information
+                    default: ""
               template:
                 spec:
                   fetch:
