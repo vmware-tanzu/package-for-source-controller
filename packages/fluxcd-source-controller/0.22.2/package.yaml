@@ -1,0 +1,27 @@
+apiVersion: data.packaging.carvel.dev/v1alpha1
+kind: Package
+metadata:
+  name: fluxcd.source.controller.community.tanzu.vmware.com.0.22.2
+spec:
+  refName: fluxcd.source.controller.community.tanzu.vmware.com
+  version: 0.22.2
+  releasedAt: "2022-03-23T19:13:40Z"
+  valuesSchema:
+    openAPIv3:
+      properties: {}
+  template:
+    spec:
+      fetch:
+      - imgpkgBundle:
+          image: index.docker.io/eforondavmware/fluxcd-source-controller-bundle@sha256:3c7322c423571ba5d59046b9e515c6b55789032b02e51439bc434b6b87f03ea8
+      template:
+      - ytt:
+          paths:
+          - config/
+      - kbld:
+          paths:
+          - '-'
+          - .imgpkg/images.yml
+          - config/kapp.yml
+      deploy:
+      - kapp: {}
