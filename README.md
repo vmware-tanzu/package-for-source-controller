@@ -8,7 +8,25 @@ and is a core component of the [GitOps toolkit](https://toolkit.fluxcd.io).
 
 ## Configuration
 
-Source controller package has no configurable properties.
+The fluxcd-source-controller package has following configurable properties.
+
+| Value           | Required/Optional |                           Description                                                |
+|-----------------|-------------------|--------------------------------------------------------------------------------------|
+| `namespace`     | Optional          | Sets namespace for k8s objects where resources of source-controller will be created. |
+| `limits_cpu`    | Optional          | Sets maximum usage of cpu for source-controller deployment.                          |
+| `limits_memory` | Optional          | Sets maximum usage of memory for source-controller deployment.                       |
+| `no_proxy`      | Optional          | Set domains for which no proxying should be performed                                |
+| `https_proxy`   | Optional          | Set proxy connection information                                                     |
+
+```yaml
+---
+namespace: flux-system-namespace
+limits_cpu: 1050m
+limits_memory: 2Gi
+service_port: 90
+no_proxy: ""
+https_proxy: ""
+```
 
 ## Installation
 
