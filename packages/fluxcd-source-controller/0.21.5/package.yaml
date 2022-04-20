@@ -12,7 +12,7 @@ spec:
         namespace:
           type: string
           description: Deployment and service namespace
-          default: source-system
+          default: flux-system
         limits_cpu:
           type: string
           description: Set cpu usuage limit
