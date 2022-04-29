@@ -1,0 +1,9 @@
+#@data/values
+---
+namespace: flux-system
+limits_cpu: 1000m
+limits_memory: 1Gi
+service_port: 80
+no_proxy: ""
+https_proxy: ""
+http_proxy: ""

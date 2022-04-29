@@ -1,0 +1,53 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: data.packaging.carvel.dev/v1alpha1
+kind: Package
+metadata:
+  name: #@ "fluxcd-source-controller.community.tanzu.vmware.com." + data.values.version
+spec:
+  refName: fluxcd-source-controller.community.tanzu.vmware.com
+  version: #@ data.values.version
+  releasedAt: #@ data.values.timestamp
+  valuesSchema:
+    openAPIv3:
+      properties:
+        namespace:
+          type: string
+          description: Deployment and service namespace
+          default: source-system
+        limits_cpu:
+          type: string
+          description: Set cpu usuage limit
+          default: 1000m
+        limits_memory:
+          type: string
+          description: Set memory usuage limit
+          default: 1Gi
+        no_proxy:
+          type: string
+          description: Set domains for which no proxying should be performed
+          default: ""
+        https_proxy:
+          type: string
+          description: Set secure proxy connection information
+          default: ""
+        http_proxy:
+          type: string
+          description: Set unsecure proxy connection information
+          default: ""
+  template:
+    spec:
+      fetch:
+      - imgpkgBundle:
+          image: #@ data.values.bundle
+      template:
+      - ytt:
+          paths:
+            - "config/"
+      - kbld:
+          paths:
+          - "-"
+          - ".imgpkg/images.yml"
+          - "config/kapp.yml"
+      deploy:
+      - kapp: {}
