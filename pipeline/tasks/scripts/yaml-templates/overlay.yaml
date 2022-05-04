@@ -1,32 +1,43 @@
 #@ load("@ytt:data", "data")
 #@ load("@ytt:overlay", "overlay")
-#@overlay/match by=overlay.subset({"kind":"Deployment"})
+#@ load("@ytt:template", "template")
+#@ svc_account_name = "source-controller-serviceaccount"
+
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: #@ svc_account_name
+ namespace: #@ data.values.namespace
+
+#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}})
+---
+metadata:
+ #@overlay/match missing_ok=True
+ namespace: #@ data.values.namespace
 spec:
-  template:
-    spec:
-      containers:
-        #@overlay/match by=overlay.all
-        - env:
-          #@ if data.values.no_proxy != "":
-          - name: NO_PROXY
-            value: #@ data.values.no_proxy
-          #@ end
-          #@ if data.values.https_proxy != "":
-          - name: HTTPS_PROXY
-            value: #@ data.values.https_proxy
-          #@ end
-          #@ if data.values.http_proxy != "":
-          - name: HTTP_PROXY
-            value: #@ data.values.http_proxy
-          #@ end
-          resources:
-            limits:
-              cpu: #@ data.values.limits_cpu
-              memory: #@ data.values.limits_memory
----
-#@ load("@ytt:data", "data")
-#@ load("@ytt:overlay", "overlay")
+ template:
+  spec:
+    #@overlay/match missing_ok=True
+    serviceAccountName: #@ svc_account_name
+    containers:
+      #@overlay/match by=overlay.all
+      - env:
+        #@ if data.values.no_proxy != "":
+        - name: NO_PROXY
+          value: #@ data.values.no_proxy
+        #@ end
+        #@ if data.values.https_proxy != "":
+        - name: HTTPS_PROXY
+          value: #@ data.values.https_proxy
+        #@ end
+        - name: HTTP_PROXY
+          value: #@ data.values.http_proxy
+        #@ end
+        resources:
+          limits:
+            cpu: #@ data.values.limits_cpu
+            memory: #@ data.values.limits_memory
 
 #@overlay/match by=overlay.subset({"kind": "Namespace"})
 ---
@@ -63,7 +74,7 @@ roleRef:
 subjects:
   #@overlay/match by=overlay.subset({"kind": "ServiceAccount"}), expects=1
   - kind: ServiceAccount
-    name: default
+    name: #@ svc_account_name
     namespace: #@ data.values.namespace
 
 #@overlay/match by=overlay.subset({"kind": "ClusterRole", "metadata": {"name": "fluxcd-source-manager-role"}})
@@ -82,14 +93,8 @@ roleRef:
 subjects:
   #@overlay/match by=overlay.subset({"kind": "ServiceAccount"}), expects=1
   - kind: ServiceAccount
-    name: default
+    name: #@ svc_account_name
     namespace: #@ data.values.namespace
-
-#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}})
----
-metadata:
- #@overlay/match missing_ok=True
- namespace: #@ data.values.namespace
 
 #@overlay/match by=overlay.subset({"kind": "Service", "metadata": {"name": "source-controller"}})
 ---
