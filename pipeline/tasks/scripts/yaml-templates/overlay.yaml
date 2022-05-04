@@ -31,6 +31,7 @@ spec:
         - name: HTTPS_PROXY
           value: #@ data.values.https_proxy
         #@ end
+        #@ if data.values.http_proxy != "":
         - name: HTTP_PROXY
           value: #@ data.values.http_proxy
         #@ end
