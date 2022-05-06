@@ -16,7 +16,8 @@ The fluxcd-source-controller package has following configurable properties.
 | `limits_cpu`    | Optional          | Sets maximum usage of cpu for source-controller deployment.                          |
 | `limits_memory` | Optional          | Sets maximum usage of memory for source-controller deployment.                       |
 | `no_proxy`      | Optional          | Set domains for which no proxying should be performed                                |
-| `https_proxy`   | Optional          | Set proxy connection information                                                     |
+| `https_proxy`   | Optional          | Set secure proxy connection information                                              |
+| `http_proxy`    | Optional          | Set unsecure proxy connection information                                            |
 
 ```yaml
 ---
@@ -26,6 +27,7 @@ limits_memory: 2Gi
 service_port: 90
 no_proxy: ""
 https_proxy: ""
+http_proxy: ""
 ```
 
 ## Installation
@@ -41,10 +43,11 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     For example:
 
     ```shell
-    $ tanzu package available list fluxcd-source-controller.community.tanzu.vmware.com
-        \ Retrieving package versions for fluxcd-source-controller.tanzu.vmware.com...
-          NAME                                                VERSION  RELEASED-AT
-          fluxcd-source-controller.community.tanzu.vmware.com  0.21.2   2021-10-27 19:00:00 -0500 -05
+    \ Retrieving package versions for fluxcd-source-controller.community.tanzu.vmware.com...
+      NAME                                                 VERSION  RELEASED-AT
+      fluxcd-source-controller.community.tanzu.vmware.com  0.21.2   2022-02-07 06:14:08 -0500 -05
+      fluxcd-source-controller.community.tanzu.vmware.com  0.21.3   2022-02-07 06:14:08 -0500 -05
+      fluxcd-source-controller.community.tanzu.vmware.com  0.21.7   2022-02-07 06:14:08 -0500 -05
     ```
 
 2. Install the package by running:
@@ -60,7 +63,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     For example:
 
     ```shell
-    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.21.2
+    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.21.7
     \ Installing package 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Getting package metadata for 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Creating service account 'fluxcd-source-controller-default-sa'
@@ -68,7 +71,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     | Creating cluster role binding 'fluxcd-source-controller-default-cluster-rolebinding'
     | Creating package resource
     / Waiting for 'PackageInstall' reconciliation for 'fluxcd-source-controller'
-    \ 'PackageInstall' resource install status: Reconciling
+    / 'PackageInstall' resource install status: Reconciling
 
 
      Added installed package 'fluxcd-source-controller'
@@ -86,7 +89,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     \ Retrieving installation details for fluxcd-source-controller...
     NAME:                    fluxcd-source-controller
     PACKAGE-NAME:            fluxcd-source-controller.community.tanzu.vmware.com
-    PACKAGE-VERSION:         0.21.2
+    PACKAGE-VERSION:         0.21.7
     STATUS:                  Reconcile succeeded
     CONDITIONS:              [{ReconcileSucceeded True  }]
     USEFUL-ERROR-MESSAGE:
