@@ -1,0 +1,86 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:template", "template")
+
+#@ svc_account_name = "source-controller-serviceaccount"
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: #@ svc_account_name
+  namespace: #@ data.values.namespace
+
+#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}})
+---
+metadata:
+ #@overlay/match missing_ok=True
+ namespace: #@ data.values.namespace
+spec:
+ template:
+  spec:
+    #@overlay/match missing_ok=True
+    serviceAccountName: #@ svc_account_name
+
+#@overlay/match by=overlay.subset({"kind": "Namespace"})
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: #@ data.values.namespace
+
+#@overlay/match by=overlay.subset({"kind": "Service"})
+---
+spec:
+  ports:
+    #@overlay/match by=overlay.subset({"name": "http"}), expects=1
+    - name: http
+      port: #@ data.values.service_port
+
+#@overlay/match by=overlay.subset({"kind": "Role", "metadata": {"name": "leader-election-role"}})
+---
+metadata:
+  #@overlay/match missing_ok=True
+  namespace: #@ data.values.namespace
+  name: #@ "{}-leader-election-role".format("fluxcd-source")
+
+#@overlay/match by=overlay.subset({"kind": "RoleBinding", "metadata": {"name": "leader-election-rolebinding"}})
+---
+metadata:
+  #@overlay/match missing_ok=True
+  namespace: #@ data.values.namespace
+  name: #@ "{}-leader-election-rolebinding".format("fluxcd-source")
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: #@ "{}-leader-election-role".format("fluxcd-source")
+subjects:
+  #@overlay/match by=overlay.subset({"kind": "ServiceAccount"}), expects=1
+  - kind: ServiceAccount
+    name: #@ svc_account_name
+    namespace: #@ data.values.namespace
+
+#@overlay/match by=overlay.subset({"kind": "ClusterRole", "metadata": {"name": "manager-role"}})
+---
+metadata:
+  name: #@ "{}-manager-role".format("fluxcd-source")
+
+#@overlay/match by=overlay.subset({"kind": "ClusterRoleBinding", "metadata": {"name": "manager-rolebinding"}})
+---
+metadata:
+  name: #@ "{}-manager-rolebinding".format("fluxcd-source")
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: #@ "{}-manager-role".format("fluxcd-source")
+subjects:
+  #@overlay/match by=overlay.subset({"kind": "ServiceAccount"}), expects=1
+  - kind: ServiceAccount
+    name: #@ svc_account_name
+    namespace: #@ data.values.namespace
+
+#@overlay/match by=overlay.subset({"kind": "Service", "metadata": {"name": "source-controller"}})
+---
+metadata:
+ #@overlay/match missing_ok=True
+ namespace: #@ data.values.namespace
