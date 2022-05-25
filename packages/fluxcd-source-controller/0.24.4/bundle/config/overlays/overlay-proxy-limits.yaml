@@ -1,0 +1,28 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:overlay", "overlay")
+
+#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}})
+---
+spec:
+ template:
+  spec:
+    #@overlay/match missing_ok=True
+    containers:
+      #@overlay/match by=overlay.all
+      - env:
+        #@ if data.values.proxy.no_proxy != "":
+        - name: NO_PROXY
+          value: #@ data.values.proxy.no_proxy
+        #@ end
+        #@ if data.values.proxy.https_proxy != "":
+        - name: HTTPS_PROXY
+          value: #@ data.values.proxy.https_proxy
+        #@ end
+        #@ if data.values.proxy.http_proxy != "":
+        - name: HTTP_PROXY
+          value: #@ data.values.proxy.http_proxy
+        #@ end
+        resources:
+          limits:
+            cpu: #@ data.values.resources.limits_cpu
+            memory: #@ data.values.resources.limits_memory

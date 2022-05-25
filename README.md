@@ -20,14 +20,15 @@ The fluxcd-source-controller package has following configurable properties.
 | `http_proxy`    | Optional          | Set unsecure proxy connection information                                            |
 
 ```yaml
----
-namespace: flux-system-namespace
-limits_cpu: 1050m
-limits_memory: 2Gi
-service_port: 90
-no_proxy: ""
-https_proxy: ""
-http_proxy: ""
+namespace: source-system
+resources:
+ limits_cpu: 1050m
+ limits_memory: 2Gi
+proxy:
+ no_proxy: ""
+ https_proxy: ""
+ http_proxy: ""
+service_port: 80
 ```
 
 ## Installation
