@@ -48,7 +48,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
       NAME                                                 VERSION  RELEASED-AT
       fluxcd-source-controller.community.tanzu.vmware.com  0.21.2   2022-02-07 06:14:08 -0500 -05
       fluxcd-source-controller.community.tanzu.vmware.com  0.21.3   2022-02-07 06:14:08 -0500 -05
-      fluxcd-source-controller.community.tanzu.vmware.com  0.21.7   2022-02-07 06:14:08 -0500 -05
+      fluxcd-source-controller.community.tanzu.vmware.com  0.24.4   2022-02-07 06:14:08 -0500 -05
     ```
 
 2. Install the package by running:
@@ -64,7 +64,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     For example:
 
     ```shell
-    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.21.7
+    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.24.4
     \ Installing package 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Getting package metadata for 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Creating service account 'fluxcd-source-controller-default-sa'
@@ -90,7 +90,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     \ Retrieving installation details for fluxcd-source-controller...
     NAME:                    fluxcd-source-controller
     PACKAGE-NAME:            fluxcd-source-controller.community.tanzu.vmware.com
-    PACKAGE-VERSION:         0.21.7
+    PACKAGE-VERSION:         0.24.4
     STATUS:                  Reconcile succeeded
     CONDITIONS:              [{ReconcileSucceeded True  }]
     USEFUL-ERROR-MESSAGE:
@@ -99,13 +99,13 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     Verify that `STATUS` is `Reconcile succeeded`
 
     ```shell
-    kubectl get pods -n flux-system
+    kubectl get pods -n source-system
     ```
 
     For example:
 
     ```shell
-    $ kubectl get pods -n flux-system
+    $ kubectl get pods -n source-system
     NAME                                 READY   STATUS    RESTARTS   AGE
     source-controller-69859f545d-ll8fj   1/1     Running   0          3m38s
     ```
@@ -116,12 +116,12 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
 
 1. Verify all the objects are installed:
 
-    This package would create a new namespace where all the elements of fluxcd will be hosted called `flux-system`
+    This package would create a new namespace where all the elements of fluxcd will be hosted called `source-system`
 
     you can verify the main components of `fluxcd-source-controller` were installed by running:
 
     ```shell
-    kubectl get all -n flux-system
+    kubectl get all -n source-system
     NAME                                     READY   STATUS    RESTARTS   AGE
     pod/source-controller-7684c85659-2zfxb   1/1     Running   0          40m
 
@@ -144,7 +144,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     In order to check all the CRDs were installed you can run:
 
     ```shell
-    kubectl get crds -n flux-system | grep ".fluxcd.io"
+    kubectl get crds -n source-system | grep ".fluxcd.io"
     buckets.source.toolkit.fluxcd.io                         2022-03-07T19:20:14Z
     gitrepositories.source.toolkit.fluxcd.io                 2022-03-07T19:20:14Z
     helmcharts.source.toolkit.fluxcd.io                      2022-03-07T19:20:14Z
