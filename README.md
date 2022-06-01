@@ -1,10 +1,28 @@
 # Fluxcd-source-controller
 
-The source-controller is a Kubernetes operator, specialised in artifacts acquisition
-from external sources such as Git, Helm repositories and S3 buckets.
+## What this package does
+
+The main role of the source management component is to provide a common interface for artifacts acquisition. The source API defines a set of Kubernetes objects that cluster admins and various automated operators can interact with to offload the Git and Helm repositories operations to a dedicated controller.
+
+The source-controller is a Kubernetes operator, specialises in artifacts acquisition
+from external sources such as Git, Helm repositories, and S3 buckets.
 The source-controller implements the
 [source.toolkit.fluxcd.io](https://github.com/fluxcd/source-controller/tree/master/docs/spec/v1beta1) API
 and is a core component of the [GitOps toolkit](https://toolkit.fluxcd.io).
+
+This documentation provides information about the specific TCE package. Please visit the [TCE package management page](https://tanzucommunityedition.io/docs/v0.11/package-management/) for general information about installation, removal, troubleshooting, and other topics.
+
+## Components
+
+This package uses flux-source-controller version 0.24.4
+
+## Files
+
+Not relevant for this particular package.
+
+## Package Limitations
+
+You can report the bugs related with the package [here](https://github.com/vmware-tanzu/package-for-source-controller/issues)
 
 ## Configuration
 
@@ -31,11 +49,15 @@ proxy:
 service_port: 80
 ```
 
+#### Multi-cloud configuration steps
+
+There are none
+
 ## Installation
 
 To install FluxCD source-controller from the Tanzu Application Platform package repository:
 
-1. List version information for the package by running:
+1. List the version information for the package by running:
 
     ```shell
     tanzu package available list fluxcd-source-controller.community.tanzu.vmware.com
@@ -105,7 +127,6 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     For example:
 
     ```shell
-    $ kubectl get pods -n source-system
     NAME                                 READY   STATUS    RESTARTS   AGE
     source-controller-69859f545d-ll8fj   1/1     Running   0          3m38s
     ```
@@ -116,9 +137,9 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
 
 1. Verify all the objects are installed:
 
-    This package would create a new namespace where all the elements of fluxcd will be hosted called `source-system`
+    This package creates a new namespace called `source-system` hosts all the elements of fluxcd
 
-    you can verify the main components of `fluxcd-source-controller` were installed by running:
+    You can verify that the main components of `fluxcd-source-controller` were installed by running:
 
     ```shell
     kubectl get all -n source-system
@@ -135,13 +156,9 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     replicaset.apps/source-controller-7684c85659   1         1         1       40m
     ```
 
-    you should get something really similar!
+    You result should be really similar!
 
-2. Verify all the CRD were installed correctly:
-
-    The way you would communicate with `fluxcd-source-controller` would be through its CRDs, this will be your main action point.
-
-    In order to check all the CRDs were installed you can run:
+2.  You use CRDs to communicate with `fluxcd-source-controller`. Verify all the CRDs were installed correctly by running:
 
     ```shell
     kubectl get crds -n source-system | grep ".fluxcd.io"
@@ -151,44 +168,41 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     helmrepositories.source.toolkit.fluxcd.io                2022-03-07T19:20:14Z
     ```
 
-3. Try one simple example:
+3. Try one simple example to check that everything is working as expected:
 
-    Try one quick example yourself, so you can check everything is working as expected
 
-    - Let's consume a `GitRepository` object,
+    - To consume a `GitRepository` object, create the following `gitrepository-sample.yaml` file:
 
-      - Create the following `gitrepository-sample.yaml` file:
+        ```yaml
+        apiVersion: source.toolkit.fluxcd.io/v1beta1
+        kind: GitRepository
+        metadata:
+          name: gitrepository-sample
+        spec:
+          interval: 1m
+          url: https://github.com/stefanprodan/podinfo
+          ref:
+            branch: master
+        ```
 
-          ```yaml
-          apiVersion: source.toolkit.fluxcd.io/v1beta1
-          kind: GitRepository
-          metadata:
-            name: gitrepository-sample
-          spec:
-            interval: 1m
-            url: https://github.com/stefanprodan/podinfo
-            ref:
-              branch: master
-          ```
+    - Apply the created config:
 
-      - Apply the created conf
+        ```shell
+        kubectl apply -f gitrepository-sample.yaml
+        gitrepository.source.toolkit.fluxcd.io/gitrepository-sample created
+        ```
 
-          ```shell
-          kubectl apply -f gitrepository-sample.yaml
-          gitrepository.source.toolkit.fluxcd.io/gitrepository-sample created
-          ```
+    - Check that the Git repository was fetched correctly:
 
-      - Check the git-repository was fetched correctly
+        ```shell
+        kubectl get GitRepository
+        NAME                   URL                                       READY   STATUS                                                              AGE
+        gitrepository-sample   https://github.com/stefanprodan/podinfo   True    Fetched revision: master/132f4e719209eb10b9485302f8593fc0e680f4fc   4s
+        ```
 
-          ```shell
-          kubectl get GitRepository
-          NAME                   URL                                       READY   STATUS                                                              AGE
-          gitrepository-sample   https://github.com/stefanprodan/podinfo   True    Fetched revision: master/132f4e719209eb10b9485302f8593fc0e680f4fc   4s
-          ```
-
-    You can find more examples checking out the samples folder on [fluxcd/source-controller/samples](https://github.com/fluxcd/source-controller/tree/main/config/samples)
+    You can find more examples [here](https://github.com/fluxcd/source-controller/tree/main/config/samples).
 
 ## Documentation
 
-For documentation specific to fluxcd-source-controller, check out the main repository
-[fluxcd/source-controller](https://github.com/fluxcd/source-controller).
+For documentation specific to fluxcd-source-controller, visit
+[the main fluxcd/source-controller repository](https://github.com/fluxcd/source-controller).
