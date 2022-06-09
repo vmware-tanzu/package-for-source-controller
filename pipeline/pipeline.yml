@@ -167,8 +167,13 @@ jobs:
             yq --version
 
             # ko
-            cd ko-mirror
-            go build -o ../tools/ko .
+            pushd tools
+              VERSION=0.11.2 # choose the latest version
+              OS=Linux     # or Darwin
+              ARCH=x86_64  # or arm64, i386, s390x
+              curl -L https://github.com/google/ko/releases/download/v${VERSION}/ko_${VERSION}_${OS}_${ARCH}.tar.gz | tar xzf - ko
+              chmod +x ./ko
+            popd
 
 
   - task: build-config-file
@@ -178,9 +183,10 @@ jobs:
         type: registry-image
         source:
           repository: harbor-repo.vmware.com/dockerhub-proxy-cache/library/ubuntu
-          tag: latest
+          tag: sha256:9101220a875cee98b016668342c489ff0674f247f6ca20dfc91b91c0f28581ae
       inputs:
       - name: flux-source-controller
+      - name: tce-packages
       - name: tools
       outputs:
       - name: crds
@@ -207,23 +213,10 @@ jobs:
             ---
             EOL
 
-            cat > crds/config/values.yml <<EOL
-            #@data/values
-            ---
-            service_port: 80
-            EOL
+            cp tce-packages/pipeline/tasks/scripts/yaml-templates/values.yaml crds/config/values.yml
 
             # Adding kapp.yml to avoid Phanton diffs
-            cat > crds/config/kapp.yml <<EOL
-            apiVersion: kapp.k14s.io/v1alpha1
-            kind: Config
-            rebaseRules:
-            - path: [status]
-              type: copy
-              sources: [existing]
-              resourceMatchers:
-              - allMatcher: {}
-            EOL
+            cp tce-packages/pipeline/tasks/scripts/yaml-templates/kapp.yaml crds/config/kapp.yml
 
             cat > kustomize-config/kustomization.yml <<EOL
             namespace: flux-system
@@ -239,6 +232,8 @@ jobs:
             ./kustomize build flux-source-controller/config/default > kustomize-config/default-config.yml
 
             ./kustomize build kustomize-config >> crds/config/config.yml
+
+            cp tce-packages/pipeline/tasks/scripts/yaml-templates/overlay.yaml crds/config/overlay.yml
 
   - task: build-and-push-bundle
     privileged: true
@@ -300,38 +295,7 @@ jobs:
 
             export PATH="$PATH:$(pwd)/tools"
 
-            cat > template.yaml <<"EOF"
-            #@ load("@ytt:data", "data")
-            ---
-            apiVersion: data.packaging.carvel.dev/v1alpha1
-            kind: Package
-            metadata:
-              name: #@ "fluxcd.source.controller.community.tanzu.vmware.com." + data.values.version
-            spec:
-              refName: fluxcd.source.controller.community.tanzu.vmware.com
-              version: #@ data.values.version
-              releasedAt: #@ data.values.timestamp
-              valuesSchema:
-                openAPIv3:
-                  properties: {}
-              template:
-                spec:
-                  fetch:
-                  - imgpkgBundle:
-                      image: #@ data.values.bundle
-                  template:
-                  - ytt:
-                      paths:
-                        - "config/"
-                  - kbld:
-                      paths:
-                      - "-"
-                      - ".imgpkg/images.yml"
-                      - "config/kapp.yml"
-                  deploy:
-                  - kapp: {}
-            EOF
-
+            cp tce-packages/pipeline/tasks/scripts/yaml-templates/package.yaml template.yaml
 
             version="$(echo $TAG_VERSION | tr -d v)"
             bundle="$(yq e '.bundle.image' output/bundle.yml)"
@@ -417,7 +381,7 @@ jobs:
         new_version="$(version_from_semver ((.:tag_version)))"
 
         echo "Testing Install"
-        install_package "fluxcd-source-controller" "fluxcd.source.controller.community.tanzu.vmware.com" $new_version
+        install_package "fluxcd-source-controller" "fluxcd-source-controller.community.tanzu.vmware.com" $new_version
 
         echo "Testing Uninstall"
         delete_package "fluxcd-source-controller"
@@ -465,7 +429,7 @@ jobs:
         ./get_helm.sh
 
         echo "Installing fluxcd-source-controller newest version"
-        install_package "fluxcd-source-controller" "fluxcd.source.controller.community.tanzu.vmware.com" $new_version
+        install_package "fluxcd-source-controller" "fluxcd-source-controller.community.tanzu.vmware.com" $new_version
 
         function cleanup(){
             EXIT_CODE="$?"
