@@ -13,35 +13,43 @@ spec:
           type: string
           description: Deployment and service namespace
           default: source-system
-        limits_cpu:
-          type: string
-          description: Set cpu usuage limit
-          default: 1000m
-        limits_memory:
-          type: string
-          description: Set memory usuage limit
-          default: 1Gi
+        resources:
+          type: object
+          description: Pod resource limits
+          properties:
+             limits_cpu:
+               type: string
+               description: Set cpu usuage limit
+               default: 1000m
+             limits_memory:
+               type: string
+               description: Set memory usuage limit
+               default: 1Gi
         service_port:
-          type: string
+          type: integer
           description: Set service port
           default: 80
-        no_proxy:
-          type: string
-          description: Set domains for which no proxying should be performed
-          default: ""
-        https_proxy:
-          type: string
-          description: Set secure proxy connection information
-          default: ""
-        http_proxy:
-          type: string
-          description: Set unsecure proxy connection information
-          default: ""
+        proxy:
+          type: object 
+          description: Pod proxy configuration
+          properties:
+            no_proxy:
+              type: string
+              description: Set domains for which no proxying should be performed
+              default: ""
+            https_proxy:
+              type: string
+              description: Set secure proxy connection information
+              default: ""
+            http_proxy:
+              type: string
+              description: Set unsecure proxy connection information
+              default: ""
   template:
     spec:
       fetch:
       - imgpkgBundle:
-          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle@sha256:4dc37bdc0a6188137905639cccd1938edb1ae882698b3d58a24615b44eb1fa3f
+          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle@sha256:774ab542488edbd77ab9d20a469dcd6c487196ebad9fcffb8b91acdf9b70a2cc
       template:
       - ytt:
           paths:
