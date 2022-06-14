@@ -6,6 +6,6 @@ images:
     kbld.carvel.dev/origins: |
       - resolved:
           tag: v0.24.4
-          url: fluxcd/source-controller:v0.24.4
-  image: index.docker.io/fluxcd/source-controller@sha256:b4e671bd9c53f384986daa833042a91f2633740c192cdec575d9ef6968c96f97
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller:v0.24.4
+  image: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:33936bcdc4e084808b47e925491d7cfb4e90268782a98931d6dae8a2dfde40da
 kind: ImagesLock
