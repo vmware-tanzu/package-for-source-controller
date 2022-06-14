@@ -14,7 +14,11 @@ This documentation provides information about the specific TCE package. Please v
 
 ## Components
 
-This package uses flux-source-controller version 0.24.4
+This package uses flux-source-controller version 0.24.4.1
+
+## Fixes
+
+Fixing valuesSchema bug in release 0.24.4.
 
 ## Files
 
