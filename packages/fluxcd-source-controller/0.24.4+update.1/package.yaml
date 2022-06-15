@@ -1,10 +1,10 @@
 apiVersion: data.packaging.carvel.dev/v1alpha1
 kind: Package
 metadata:
-  name: fluxcd-source-controller.community.tanzu.vmware.com.0.24.4.1
+  name: fluxcd-source-controller.community.tanzu.vmware.com.0.24.4+update.1
 spec:
   refName: fluxcd-source-controller.community.tanzu.vmware.com
-  version: 0.24.4.1
+  version: 0.24.4+update.1
   releaseNotes: "Fixed valuesSchema bug and updated alpine image by distroless base image"
   releasedAt: "2022-06-15T11:14:08Z"
   valuesSchema:
@@ -50,14 +50,14 @@ spec:
     spec:
       fetch:
       - imgpkgBundle:
-          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle@sha256:774ab542488edbd77ab9d20a469dcd6c487196ebad9fcffb8b91acdf9b70a2cc
+          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle:0.24.4-update.1
       template:
       - ytt:
           paths:
           - config/
       - kbld:
           paths:
-          - '-'
+          - "-"
           - .imgpkg/images.yml
       deploy:
-      - kapp: {}
+        - kapp: {}
