@@ -14,7 +14,7 @@ This documentation provides information about the specific TCE package. Please v
 
 ## Components
 
-This package uses flux-source-controller version 0.24.4.1
+This package uses flux-source-controller version 0.24.4+update.1
 
 ## Fixes
 
@@ -53,7 +53,7 @@ proxy:
 service_port: 80
 ```
 
-#### Multi-cloud configuration steps
+### Multi-cloud configuration steps
 
 There are none
 
@@ -71,10 +71,10 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
 
     ```shell
     \ Retrieving package versions for fluxcd-source-controller.community.tanzu.vmware.com...
-      NAME                                                 VERSION  RELEASED-AT
-      fluxcd-source-controller.community.tanzu.vmware.com  0.21.2   2022-02-07 06:14:08 -0500 -05
-      fluxcd-source-controller.community.tanzu.vmware.com  0.21.3   2022-02-07 06:14:08 -0500 -05
-      fluxcd-source-controller.community.tanzu.vmware.com  0.24.4.1   2022-02-07 06:14:08 -0500 -05
+      NAME                                                 VERSION           RELEASED-AT
+      fluxcd-source-controller.community.tanzu.vmware.com  0.21.2            2022-02-07 06:14:08 -0500 -05
+      fluxcd-source-controller.community.tanzu.vmware.com  0.21.3            2022-02-07 06:14:08 -0500 -05
+      fluxcd-source-controller.community.tanzu.vmware.com  0.24.4+update.1   2022-02-07 06:14:08 -0500 -05
     ```
 
 2. Install the package by running:
@@ -90,7 +90,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     For example:
 
     ```shell
-    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.24.4.1
+    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.24.4+update.1
     \ Installing package 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Getting package metadata for 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Creating service account 'fluxcd-source-controller-default-sa'
@@ -116,7 +116,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     \ Retrieving installation details for fluxcd-source-controller...
     NAME:                    fluxcd-source-controller
     PACKAGE-NAME:            fluxcd-source-controller.community.tanzu.vmware.com
-    PACKAGE-VERSION:         0.24.4.1
+    PACKAGE-VERSION:         0.24.4+update.1
     STATUS:                  Reconcile succeeded
     CONDITIONS:              [{ReconcileSucceeded True  }]
     USEFUL-ERROR-MESSAGE:
@@ -162,7 +162,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
 
     You result should be really similar!
 
-2.  You use CRDs to communicate with `fluxcd-source-controller`. Verify all the CRDs were installed correctly by running:
+2. You use CRDs to communicate with `fluxcd-source-controller`. Verify all the CRDs were installed correctly by running:
 
     ```shell
     kubectl get crds -n source-system | grep ".fluxcd.io"
@@ -173,7 +173,6 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     ```
 
 3. Try one simple example to check that everything is working as expected:
-
 
     - To consume a `GitRepository` object, create the following `gitrepository-sample.yaml` file:
 
