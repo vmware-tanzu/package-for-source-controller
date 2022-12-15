@@ -1,0 +1,11 @@
+#@data/values
+---
+namespace: test-ns
+resources:
+ limits_cpu: 1050m
+ limits_memory: 2Gi
+proxy:
+ no_proxy: "no_proxy.example.com"
+ https_proxy: "http://user:password@proxy.example.com:3128/"
+ http_proxy: "http://proxy.example.com:3128"
+service_port: 90

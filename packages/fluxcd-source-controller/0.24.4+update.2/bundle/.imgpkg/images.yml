@@ -1,0 +1,11 @@
+---
+apiVersion: imgpkg.carvel.dev/v1alpha1
+images:
+- annotations:
+    kbld.carvel.dev/id: fluxcd/source-controller:v0.24.4
+    kbld.carvel.dev/origins: |
+      - resolved:
+          tag: v0.24.4
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller:v0.24.4
+  image: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:33936bcdc4e084808b47e925491d7cfb4e90268782a98931d6dae8a2dfde40da
+kind: ImagesLock
