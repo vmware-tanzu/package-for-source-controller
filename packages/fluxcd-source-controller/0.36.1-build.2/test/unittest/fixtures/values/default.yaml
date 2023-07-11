@@ -1,0 +1,34 @@
+#@data/values
+---
+namespace: test-ns
+resources:
+ limits_cpu: 1050m
+ limits_memory: 2Gi
+proxy:
+ no_proxy: "no_proxy.example.com"
+ https_proxy: "http://user:password@proxy.example.com:3128/"
+ http_proxy: "http://proxy.example.com:3128"
+service_port: 90
+kubernetes_distribution: openshift
+kubernetes_version: 1.24.5
+ca_bundle: |-
+ -----BEGIN CERTIFICATE-----
+ MIIDQTCCAimgAwIBAgIUD+rKGihrwOCFW57gJXXnez6YDFAwDQYJKoZIhvcNAQEL
+ BQAwJTEPMA0GA1UECgwGVk13YXJlMRIwEAYDVQQDDAlsb2NhbGhvc3QwHhcNMjEw
+ MTIxMDg0NjEyWhcNMzEwMTE5MDg0NjEyWjAlMQ8wDQYDVQQKDAZWTXdhcmUxEjAQ
+ BgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+ AMPMvqcMoJ+XYmuN7JKnro2ZiS0qeYto1VuXcgRpKf2Si6ef/BxMwlzGbWxJwDtm
+ w4ka6V4YHPXojr52CcU4R4/WlEvty8+5sqE05FGmv8OyaVqX4q8Y9ScjvLcWp0I6
+ +erhIeqBooZ0cz2ESQhb2dYvWcAcEBlJ9TuOEI+Fs9OHdH7o1KgM8+bczQ683w2g
+ R0emsbXnq78/KWonJAJpN57ykG5YXMCHQoolOIMeuNcYzP+jxZtjeKkywIKPro2g
+ af8mHYXAn+JwUtsvabRMPCvX2jbVrhTT1oPGQmDUWXUgRe5Yz3M3foshQdDXRx79
+ ztH6xCjjZifDGrE83s2jkykCAwEAAaNpMGcwHQYDVR0OBBYEFL3DnSbTDKVZDU5L
+ JveSY/A7ZiTxMB8GA1UdIwQYMBaAFL3DnSbTDKVZDU5LJveSY/A7ZiTxMA8GA1Ud
+ EwEB/wQFMAMBAf8wFAYDVR0RBA0wC4IJbG9jYWxob3N0MA0GCSqGSIb3DQEBCwUA
+ A4IBAQAsOc6YF4FhOEAc4xG9oox6TifhartWfd4K0qi1qkkSo/Pj/Bo7SAgA5njx
+ 5N6r4sZ7iDG6H8RT9UWN73gr0HeKVf1spP8iRg1OtMn4WSALldTPoC0o9cgW8Ee+
+ W2mDDXPWrAHKbaF0YVhUGDx+IqxfmLKgmsfleADsmNgovPvpv3ZewLNE8H+ijMvE
+ I0Ru55gusBbHecX4RS8DzNzlAMIR+2sp4PnRKdU+Yji84uzDBNuYaktWQCW3SQjC
+ CfDXANLOUfxcc+C/AmtOmTmY90jjn6KNBbyh+e2eD6W8doMe4jxpTzEQ5mCLonTd
+ /9ThBY41KA/+00nhgdn+37s9L/T/
+ -----END CERTIFICATE-----

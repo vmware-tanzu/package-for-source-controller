@@ -1,0 +1,14 @@
+#@data/values
+---
+namespace: source-system
+resources:
+ limits_cpu: 1000m
+ limits_memory: 1Gi
+proxy:
+ no_proxy: ""
+ https_proxy: ""
+ http_proxy: ""
+service_port: 80
+ca_bundle: ""
+kubernetes_distribution: ""
+kubernetes_version: ""
