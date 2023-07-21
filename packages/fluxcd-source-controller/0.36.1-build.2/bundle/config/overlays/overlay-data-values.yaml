@@ -1,0 +1,52 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:overlay", "overlay")
+
+#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}})
+---
+spec:
+ template:
+  spec:
+    #@overlay/match missing_ok=True
+    containers:
+      #@overlay/match by=overlay.all
+      - env:
+        #@ if data.values.proxy.no_proxy != "":
+        - name: NO_PROXY
+          value: #@ data.values.proxy.no_proxy
+        #@ end
+        #@ if data.values.proxy.https_proxy != "":
+        - name: HTTPS_PROXY
+          value: #@ data.values.proxy.https_proxy
+        #@ end
+        #@ if data.values.proxy.http_proxy != "":
+        - name: HTTP_PROXY
+          value: #@ data.values.proxy.http_proxy
+        #@ end
+        resources:
+          limits:
+            cpu: #@ data.values.resources.limits_cpu
+            memory: #@ data.values.resources.limits_memory
+        #@ if data.values.ca_bundle != "":
+        volumeMounts:
+          - name: ca-bundle
+            mountPath: /etc/ca-bundle/cert
+        #@ end
+    #@ if data.values.ca_bundle != "":
+    volumes:
+      - name: ca-bundle
+        secret:
+          secretName: registry-ca-bundle
+    #@ end
+
+#@ if data.values.ca_bundle != "":
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-ca-bundle
+  namespace: #@ data.values.namespace
+type: Opaque
+stringData:
+  cert: #@ data.values.ca_bundle
+
+#@ end

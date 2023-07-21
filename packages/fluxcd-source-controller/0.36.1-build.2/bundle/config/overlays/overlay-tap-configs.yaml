@@ -1,0 +1,76 @@
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:data", "data")
+#@ load("@ytt:assert", "assert")
+
+#! Set up an empty dockerconfig secret that will be populated by secretgen
+#! controller during installation. This is the secret that will be used to auth
+#! to the registry when pulling the image for the deployment
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name:  private-registry-secret
+  namespace: #@ data.values.namespace
+  annotations:
+    secretgen.carvel.dev/image-pull-secret: ""
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: e30K
+
+#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}}),expects="1+"
+---
+spec:
+  template:
+    spec:
+      #@overlay/match missing_ok=True
+      imagePullSecrets:
+        - name: private-registry-secret
+
+
+#! OpenShift Security Context Constraints assigns each pod a random GID:UID at
+#! runtime, so we need to remove the default ones from upstream
+
+#@ kubernetes_distribution = data.values.kubernetes_distribution
+#@ validFlavors = [None, "", "openshift"]
+#@ if kubernetes_distribution not in validFlavors:
+#@   assert.fail("{} not in {}".format(kubernetes_distribution, validFlavors))
+#@ end
+
+#@ if kubernetes_distribution == "openshift":
+#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}}),expects="1+"
+---
+spec:
+  template:
+    spec:
+      containers:
+        #@overlay/match by=overlay.all, expects="1+"
+        - securityContext:
+            #@overlay/remove
+            seccompProfile:
+
+      securityContext:
+        #@overlay/match missing_ok=True
+        #@overlay/remove
+        fsGroup:
+        #@overlay/match missing_ok=True
+        #@overlay/remove
+        runAsUser:
+        #@overlay/match missing_ok=True
+        #@overlay/remove
+        runAsGroup:
+
+#! Otherwise we should add the recommended restricted UID:GID.
+#@ else:
+
+#@overlay/match by=overlay.subset({"kind": "Deployment", "metadata": {"name": "source-controller"}}),expects="1+"
+---
+spec:
+  template:
+    spec:
+      securityContext:
+        #@overlay/match missing_ok=True
+        runAsUser: 65534
+        #@overlay/match missing_ok=True
+        runAsGroup: 65534
+
+#@ end

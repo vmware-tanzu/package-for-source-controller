@@ -1,0 +1,11 @@
+apiVersion: vendir.k14s.io/v1alpha1
+directories:
+- contents:
+  - git:
+      commitTitle: 'storage: set `0o744` for files with exec mode set...'
+      sha: af854cfcf92a03986a3acb766dd37f50450d8a6c
+      tags:
+      - v0.36.1-1-gaf854cf
+    path: .
+  path: config/upstream
+kind: LockConfig
