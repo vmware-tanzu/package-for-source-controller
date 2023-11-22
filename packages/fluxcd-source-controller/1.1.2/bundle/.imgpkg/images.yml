@@ -1,0 +1,21 @@
+---
+apiVersion: imgpkg.carvel.dev/v1alpha1
+images:
+- annotations:
+    kbld.carvel.dev/id: fluxcd/source-controller:v1.1.2
+    kbld.carvel.dev/origins: |
+      - resolved:
+          tag: v1.1.2
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller:v1.1.2
+      - preresolved:
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:a4c9a43ee7f0e8d882c5c49ba9e41b1cd4a9b948b1d396119566172f5d97b44a
+      - preresolved:
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:a4c9a43ee7f0e8d882c5c49ba9e41b1cd4a9b948b1d396119566172f5d97b44a
+      - preresolved:
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:a4c9a43ee7f0e8d882c5c49ba9e41b1cd4a9b948b1d396119566172f5d97b44a
+      - preresolved:
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:a4c9a43ee7f0e8d882c5c49ba9e41b1cd4a9b948b1d396119566172f5d97b44a
+      - preresolved:
+          url: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:a4c9a43ee7f0e8d882c5c49ba9e41b1cd4a9b948b1d396119566172f5d97b44a
+  image: projects.registry.vmware.com/tce/fluxcd-source-controller@sha256:a4c9a43ee7f0e8d882c5c49ba9e41b1cd4a9b948b1d396119566172f5d97b44a
+kind: ImagesLock
