@@ -6,7 +6,7 @@ spec:
   refName: fluxcd-source-controller.community.tanzu.vmware.com
   version: 1.1.2
   releaseNotes: "Releasing TAP compatible source controller"
-  releasedAt: "2023-07-12T06:16:00Z"
+  releasedAt: "2023-12-01T11:00:00Z"
   valuesSchema:
     openAPIv3:
       properties:
@@ -63,7 +63,7 @@ spec:
     spec:
       fetch:
       - imgpkgBundle:
-          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle@sha256:c6ba4a4a28464113753557a17ec7412ba45279a676e9596a5c46c939786beded
+          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle@sha256:b095202828e66e3561ddc5c642bcdb10ab3d944c159e662abb567698edb0280d
       template:
       - ytt:
           paths:
