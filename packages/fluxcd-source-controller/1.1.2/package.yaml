@@ -5,7 +5,7 @@ metadata:
 spec:
   refName: fluxcd-source-controller.community.tanzu.vmware.com
   version: 1.1.2
-  releaseNotes: "Releasing TAP compatible source controller"
+  releaseNotes: "This version is not compatible with TAP version <= 1.8. Use TAP v1.9 or higher with this source controller."
   releasedAt: "2023-12-01T11:00:00Z"
   valuesSchema:
     openAPIv3:
