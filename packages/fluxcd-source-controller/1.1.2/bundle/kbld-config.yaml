@@ -1,0 +1,9 @@
+---
+apiVersion: kbld.k14s.io/v1alpha1
+kind: Config
+
+minimumRequiredVersion: 0.15.0
+
+overrides:
+- image: fluxcd/source-controller:v1.1.2
+  newImage: projects.registry.vmware.com/tce/fluxcd-source-controller:v1.1.2

@@ -14,7 +14,7 @@ This documentation provides information about the specific TCE package. Please v
 
 ## Components
 
-This package uses flux-source-controller version 0.33.0
+This package uses flux-source-controller version 1.1.2
 
 ## Fixes
 
@@ -76,6 +76,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
       fluxcd-source-controller.community.tanzu.vmware.com  0.21.3            2022-02-07 06:14:08 -0500 -05
       fluxcd-source-controller.community.tanzu.vmware.com  0.24.4+update.1   2022-02-07 06:14:08 -0500 -05
       fluxcd-source-controller.community.tanzu.vmware.com  0.33.0            2023-01-19 23:16:10 -0500 -05
+      fluxcd-source-controller.community.tanzu.vmware.com  1.1.2             2023-12-01 11:00:00 -0500 -05
     ```
 
 2. Install the package by running:
@@ -91,7 +92,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     For example:
 
     ```shell
-    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 0.33.0
+    tanzu package install fluxcd-source-controller -p fluxcd-source-controller.community.tanzu.vmware.com -v 1.1.2
     \ Installing package 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Getting package metadata for 'fluxcd-source-controller.community.tanzu.vmware.com'
     | Creating service account 'fluxcd-source-controller-default-sa'
@@ -117,7 +118,7 @@ To install FluxCD source-controller from the Tanzu Application Platform package 
     \ Retrieving installation details for fluxcd-source-controller...
     NAME:                    fluxcd-source-controller
     PACKAGE-NAME:            fluxcd-source-controller.community.tanzu.vmware.com
-    PACKAGE-VERSION:         0.33.0
+    PACKAGE-VERSION:         1.1.2
     STATUS:                  Reconcile succeeded
     CONDITIONS:              [{ReconcileSucceeded True  }]
     USEFUL-ERROR-MESSAGE:

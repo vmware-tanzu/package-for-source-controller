@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: source-controller
+  labels:
+    control-plane: controller
+spec:
+  selector:
+    matchLabels:
+      app: source-controller
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: source-controller
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    spec:
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        # Required for AWS IAM Role bindings
+        # https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts-technical-overview.html
+        fsGroup: 1337
+      containers:
+      - name: manager
+        image: fluxcd/source-controller:v1.1.2
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop: [ "ALL" ]
+          seccompProfile:
+            type: RuntimeDefault
+        ports:
+          - containerPort: 9090
+            name: http
+            protocol: TCP
+          - containerPort: 8080
+            name: http-prom
+            protocol: TCP
+          - containerPort: 9440
+            name: healthz
+            protocol: TCP
+        env:
+          - name: RUNTIME_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: TUF_ROOT # store the Fulcio root CA file in tmp
+            value: "/tmp/.sigstore"
+        args:
+          - --watch-all-namespaces
+          - --log-level=info
+          - --log-encoding=json
+          - --enable-leader-election
+          - --storage-path=/data
+          - --storage-adv-addr=source-controller.$(RUNTIME_NAMESPACE).svc.cluster.local.
+        livenessProbe:
+          httpGet:
+            port: healthz
+            path: /healthz
+        readinessProbe:
+          httpGet:
+            port: http
+            path: /
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+          - name: data
+            mountPath: /data
+          - name: tmp
+            mountPath: /tmp
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}

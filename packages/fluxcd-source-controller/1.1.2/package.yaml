@@ -1,0 +1,76 @@
+apiVersion: data.packaging.carvel.dev/v1alpha1
+kind: Package
+metadata:
+  name: fluxcd-source-controller.community.tanzu.vmware.com.1.1.2
+spec:
+  refName: fluxcd-source-controller.community.tanzu.vmware.com
+  version: 1.1.2
+  releaseNotes: "This version is not compatible with TAP version <= 1.8. Use TAP v1.9 or higher with this source controller."
+  releasedAt: "2023-12-01T11:00:00Z"
+  valuesSchema:
+    openAPIv3:
+      properties:
+        namespace:
+          type: string
+          description: Deployment and service namespace
+          default: source-system
+        resources:
+          type: object
+          description: Pod resource limits
+          properties:
+            limits_cpu:
+              type: string
+              description: Set cpu usuage limit
+              default: 1000m
+            limits_memory:
+              type: string
+              description: Set memory usuage limit
+              default: 1Gi
+        service_port:
+          type: integer
+          description: Set service port
+          default: 80
+        proxy:
+          type: object
+          description: Pod proxy configuration
+          properties:
+            no_proxy:
+              type: string
+              description: Set domains for which no proxying should be performed
+              default: ""
+            https_proxy:
+              type: string
+              description: Set secure proxy connection information
+              default: ""
+            http_proxy:
+              type: string
+              description: Set unsecure proxy connection information
+              default: ""
+        kubernetes_distribution:
+          type: string
+          default: ""
+          description: 'Distribution of Kubernetes that this package is deployed in.
+                    Acceptable values: ["", "openshift"]'
+        kubernetes_version:
+          type: string
+          default: ""
+          description: "Kubernetes version of the cluster"
+        ca_bundle:
+          type: string
+          default: ""
+          description: "a PEM-encoded CA certificate. This will be used to connect to the registry."
+  template:
+    spec:
+      fetch:
+      - imgpkgBundle:
+          image: projects.registry.vmware.com/tce/fluxcd-source-controller-bundle@sha256:b095202828e66e3561ddc5c642bcdb10ab3d944c159e662abb567698edb0280d
+      template:
+      - ytt:
+          paths:
+          - config/
+      - kbld:
+          paths:
+          - "-"
+          - .imgpkg/images.yml
+      deploy:
+        - kapp: {}
